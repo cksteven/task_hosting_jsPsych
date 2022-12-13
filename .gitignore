@@ -167,3 +167,6 @@ modules/
 
 .idea
 *.pm2
+
+## Hide Tasks
+tasks/

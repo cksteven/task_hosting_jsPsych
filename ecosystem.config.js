@@ -17,7 +17,7 @@ const reloadFlag = '--reload';
 const config = {
   apps: tasks.map((task) => ({
     name: task,
-    script: `PIPENV_VENV_IN_PROJECT=1 PIPENV_IGNORE_VIRTUALENVS=1 pipenv run python3.7 main.py ${task} ${
+    script: `PIPENV_VENV_IN_PROJECT=1 PIPENV_IGNORE_VIRTUALENVS=1 pipenv run python main.py ${task} ${
       process.env.TASK_RELOAD_ENABLED ? reloadFlag : ''
     }`,
     instances: 1,
