@@ -169,4 +169,5 @@ modules/
 *.pm2
 
 ## Hide Tasks
-tasks/
+tasks/*
+!tasks/rate_pointiness/
