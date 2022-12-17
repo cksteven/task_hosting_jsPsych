@@ -1,0 +1,5 @@
+subj_code,choice_label,choice_key,rt,color,color_coord,music,trial_number,type
+78095,1,1,2022.5,"3,4,5",XX,en-q2,6,assess
+78095,2,2,1623.2999999523163,"doctor,dentist,psychiatrist",XX,en-q4,19,assess
+78095,1,1,559.2000000476837,"New York,Boston,Chicago",XX,en-q1,21,assess
+78095,1,1,789.3999999761581,"pebble,cat,frog",XX,en-q3,22,assess

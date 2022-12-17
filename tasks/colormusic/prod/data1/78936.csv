@@ -1,0 +1,5 @@
+subj_code,choice_label,choice_key,rt,color,color_coord,music,trial_number,type
+78936,0,0,1531.3000000715256,"doctor,dentist,psychiatrist",XX,en-q4,4,assess
+78936,1,1,1297.3999999761581,"pebble,cat,frog",XX,en-q3,9,assess
+78936,1,1,3731.5,"3,4,5",XX,en-q2,10,assess
+78936,0,0,1181.5,"New York,Boston,Chicago",XX,en-q1,13,assess

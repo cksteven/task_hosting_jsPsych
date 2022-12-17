@@ -1,0 +1,5 @@
+subj_code,choice_label,choice_key,rt,color,color_coord,music,trial_number,type
+79988,1,1,6743.60000000149,"3,4,5",XX,en-q2,2,assess
+79988,0,0,1855.8999999985099,"doctor,dentist,psychiatrist",XX,en-q4,3,assess
+79988,1,1,1520.7000000029802,"pebble,cat,frog",XX,en-q3,9,assess
+79988,0,0,2153,"New York,Boston,Chicago",XX,en-q1,20,assess

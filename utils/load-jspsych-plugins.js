@@ -3,18 +3,21 @@
  * manually add each a new script element!
  */
 export default () => {
-  const pluginsPath = '../../lib/jspsych-6.1.0/plugins/';
-  return axios.get('http://sapir.psych.wisc.edu:7126/jspsych-plugins').then(({ data: plugins }) =>
-    Promise.all(
-      plugins.map((plugin) => {
-        const script = document.createElement('script');
-        return new Promise((resolve, reject) => {
-          script.onload = resolve;
-          script.onerror = reject;
-          script.src = pluginsPath + plugin;
-          document.head.appendChild(script);
-        });
-      }),
-    ),
-  );
+    const pluginsPath = '../../lib/jspsych/plugins/';
+    return axios.get(pluginsPath).then(({ data: content }) => (
+        // console.log('data', data),
+        console.log('list of plugins', content.files.map((file) => file.name).filter(e => e != null)),
+        Promise.all(
+            content.files.map((file) => file.name).filter(e => e != null).map((plugin) => {
+                const script = document.createElement('script');
+                return new Promise((resolve, reject) => {
+                    script.onload = resolve;
+                    script.onerror = reject;
+                    script.src = pluginsPath + plugin + ".js";
+                    document.head.appendChild(script);
+                });
+            }),
+        )
+    )
+    );
 };

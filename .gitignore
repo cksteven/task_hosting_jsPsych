@@ -168,6 +168,6 @@ modules/
 .idea
 *.pm2
 
-## Hide Tasks
-tasks/*
-!tasks/rate_pointiness/
+# ## Hide Tasks
+# tasks/*
+# !tasks/rate_pointiness/

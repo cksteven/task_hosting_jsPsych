@@ -1,0 +1,6 @@
+subj_code,choice_label,choice_key,rt,color,color_coord,music,trial_number,type
+77965,0,0,9068,"New York,Boston,Chicago",XX,en-q1,1,assess
+77965,1,1,6782,"3,4,5",XX,en-q2,11,assess
+77965,1,1,1444,"pebble,cat,frog",XX,en-q3,13,assess
+77965,0,0,1195,"doctor,dentist,psychiatrist",XX,en-q4,21,assess
+77965,LH,0,22751,"[u'LH', u'A1', u'DY', u'SP']","[u'197,250,127.5', u'100,100,100', u'137.5,137.5,0', u'200,0,250']",Bach,2,target

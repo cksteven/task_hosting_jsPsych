@@ -1,0 +1,6 @@
+subj_code,choice_label,choice_key,rt,color,color_coord,music,trial_number,type
+78833,1,1,1029.5,"New York,Boston,Chicago",XX,en-q1,4,assess
+78833,0,0,948.3000000119209,"pebble,cat,frog",XX,en-q3,9,assess
+78833,1,1,573.7000000476837,"doctor,dentist,psychiatrist",XX,en-q4,11,assess
+78833,2,2,888.2999999523163,"3,4,5",XX,en-q2,27,assess
+78833,MO,2,18991.399999976158,"[u'A2', u'BK', u'MO', u'MB']","[u'157.75,157.75,157.75', u'0,0,0', u'222.5,130.5,64.75', u'114.7058823,130.3921568,219.6078433']",Smooth Jazz,1,target
