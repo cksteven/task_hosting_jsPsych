@@ -9,6 +9,6 @@ export default Array.from(searchParams.entries()).reduce((acc, [key, value]) => 
   } else {
     acc[key] = value;
   }
-  console.log("RETURN ACC", acc);
+//   console.log("RETURN ACC", acc);
   return acc;
 }, {});

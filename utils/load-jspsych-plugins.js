@@ -6,14 +6,15 @@ export default () => {
     const pluginsPath = '../../lib/jspsych/plugins/';
     return axios.get(pluginsPath).then(({ data: content }) => (
         // console.log('data', data),
-        console.log('list of plugins', content.files.map((file) => file.name).filter(e => e != null)),
+        // console.log('content', content),
+        console.log('list of plugins', content.files.filter(e => e.ext == "js").map((file) => file.title).filter(e => e != null)),
         Promise.all(
-            content.files.map((file) => file.name).filter(e => e != null).map((plugin) => {
+            content.files.filter(e => e.ext == "js").map((file) => file.title).filter(e => e != null).map((plugin) => {
                 const script = document.createElement('script');
                 return new Promise((resolve, reject) => {
                     script.onload = resolve;
                     script.onerror = reject;
-                    script.src = pluginsPath + plugin + ".js";
+                    script.src = pluginsPath + plugin;
                     document.head.appendChild(script);
                 });
             }),
