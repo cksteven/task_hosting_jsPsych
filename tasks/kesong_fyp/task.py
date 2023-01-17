@@ -71,7 +71,7 @@ class Task:
         "num_trials": num_trials,
         # "completed_demographics": completed_demographics,
         "consent_agreed": consent_agreed,
-        # "rel_images_folder_path": os.path.relpath(self.images_folder_path, dirname),
+        "rel_images_folder_path": os.path.relpath(self.images_folder_path, dirname),
         # "rel_audio_folder_path": os.path.relpath(self.audio_folder_path, dirname),
     }
 

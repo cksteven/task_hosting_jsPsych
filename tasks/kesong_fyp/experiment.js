@@ -14,7 +14,7 @@ const { workerID: worker_id, fullscreen, reset, num_categories } = searchParams;
     num_trials,
     // completed_demographics,
     consent_agreed,
-    // rel_images_folder_path,
+    rel_images_folder_path,
     // rel_audio_folder_path
   } = await api({
     fn: 'trials',
@@ -78,8 +78,8 @@ const { workerID: worker_id, fullscreen, reset, num_categories } = searchParams;
       what is a typical round or spiky object.</p>
 
       <p>
-      You can click the radio buttons on the page or press the number keys
-      (1, 2, 3, 4, 5, 6, 7) on your keyboard to select your rating.
+      You can press the number keys (1, 2, 3, 4, 5, 6, 7)
+      on your keyboard to select your rating.
       Please use your instinct to rate the object shape.
       If you are not sure, just go with whatever feels right.
       </p>
@@ -90,25 +90,30 @@ const { workerID: worker_id, fullscreen, reset, num_categories } = searchParams;
   if (trials.length > 0) timeline.push(instructions_assess);
 
   const assess_block = {
-    type: jsPsychAudioButtonResponse,
+    type: jsPsychCustomImageKeyboardResponseBbox,
     input_feedback_duration: 500,
     timeline: trials
-      .filter(trial => trial.type === "assess")
+      .filter(trial => (trial.type === "assess1" || trial.type === "assess7"))
       .map((trial) => ({
-        type: jsPsychAudioButtonResponse,
+        type: jsPsychCustomImageKeyboardResponseBbox,
         prompt:
-      /*html*/ `<br>This is an <b>audio question</b>, please make sure the sound on your computer is on.<br>
-      To replay the question, <b>press R</b> on your keyboard.`,
+      /*html*/ trial.type === "assess1" ?
+            `<br /> This is an example of a <b>most round</b> object. Therefore please select <b>1</b> on the scale by pressing 1 on your keyboard.`
+            : `<br /> This is an example of a <b>most spiky</b> object. Therefore please select <b>7</b> on the scale by pressing 7 on your keyboard.`,
 
-        stimulus: rel_audiocheck_path + '/' + trial.music + ".mp3",
-        choices: trial.color.split(','),
+        stimulus: rel_images_folder_path + '/' + trial.img_id + ".jpg",
+        choices: ['1', '2', '3', '4', '5', '6', '7'],
+        stimulus_bbox_ulx: Number.parseInt(trial.bbox0),
+        stimulus_bbox_uly: Number.parseInt(trial.bbox2),
+        stimulus_bbox_lrx: Number.parseInt(trial.bbox1),
+        stimulus_bbox_lry: Number.parseInt(trial.bbox3),
 
-        questions: [{ prompt: '', name: '', rows: 1, columns: 30, required: true }],
         on_start: () => {
-          jsPsych.setProgressBar((Number(trial.trial_number) - 1) / num_trials);
+          console.log("this trial", trial);
+          // jsPsych.setProgressBar((Number(trial.trial_number) - 1) / num_trials);
         },
         on_finish: ({ rt, response }) => {
-          console.log("???", rt, response);
+          console.log("rt and response", rt, response);
           const data = {
             subj_code: worker_id,
             choice_label: response,
@@ -159,8 +164,8 @@ const { workerID: worker_id, fullscreen, reset, num_categories } = searchParams;
       </p>
 
       <p>
-      You can click the radio buttons on the page or press the number keys
-      (1, 2, 3, 4, 5, 6, 7) on your keyboard to select your rating.
+      You can press the number keys (1, 2, 3, 4, 5, 6, 7)
+      on your keyboard to select your rating.
       Please use your instinct to rate the object shape.
       If you are not sure, just go with whatever feels right.
       </p>
