@@ -60,7 +60,9 @@ const { workerID: worker_id, fullscreen, reset, num_categories } = searchParams;
 
   const continue_space = /* html */ `<div class='right small'>(press SPACE to continue)</div>`;
 
-  const qualtrics_link = "https://uwmadison.co1.qualtrics.com/jfe/form/SV_bJ9xVld2PXvp0ns?workerId=" + worker_id;
+  // const qualtrics_link = "https://uwmadison.co1.qualtrics.com/jfe/form/SV_bJ9xVld2PXvp0ns?workerId=" + worker_id;
+  const qualtrics_link = "TBD";
+
 
   const instructions_assess = {
     type: jsPsychInstructions,
@@ -204,59 +206,67 @@ const { workerID: worker_id, fullscreen, reset, num_categories } = searchParams;
     return modified_trial;
   }
 
-  // const image_trials_block = {
-  //     type: 'lupyanlab-image-similarity-with-audio',
-  //     input_feedback_duration: 500,
-  //     // Nested timeline:  https://www.jspsych.org/overview/timeline/#nested-timelines
-  //     timeline: trials
-  //         .filter(trial => trial.type != "assess")
-  //         .map(trial => randomize_lr(trial))
-  //         .map((trial) => ({
-  //             //   trial_progress_text: `Trial ${Number(trial.trial_number)} of ${num_trials}`,
-  //             // prompt: `How similar is ${trial.object}?`,
-  //             //   prompt: `How similar is PLACEHOLDER TEXT?`,
-  //             // image: rel_images_folder_path + '/' + trial.image_1,
-  //             // right_image: rel_images_folder_path + '/' + trial.image_2,
-  //             // color_coord: Object.values(JSON.parse(trial.color_coord.replace(/'/g, '"'))).map(x => x.toString()),
-  //             color_coord: trial.color_coord,
-  //             //   right_color: trial.coord2,
-  //             // audio: rel_audio_folder_path + '/' + 'image.mp3',
-  //             // right_audio: rel_audio_folder_path + '/' + 'right_image.mp3',
-  //             audio: rel_audio_folder_path + '/' + trial.music + ".mp3",
-  //             //   right_audio: rel_audio_folder_path + '/' + trial.music2 + ".mp3",
-  //             audio_start: 0,
-  //             //   right_audio_start: helper_minute_second(trial.start2),
-  //             audio_end: 15,
-  //             //   right_audio_end: helper_minute_second(trial.start2) + 15,
-  //             //   shape_image: trial.shape_image,
-  //             keys: trial.color.map((_, i) => `${i}`).concat(['4']),
-  //             labels: trial.color.concat(["I don'hear any music."]),
-  //             on_start: () => {
-  //                 jsPsych.setProgressBar((Number(trial.trial_number) - 1) / num_trials);
-  //             },
-  //             on_finish: ({ rt, key, label }) => {
-  //                 const data = {
-  //                     subj_code: worker_id,
-  //                     choice_label: label,
-  //                     choice_key: key,
-  //                     rt,
-  //                     ...trial,
-  //                 };
+  const image_trials_block = {
+    type: jsPsychCustomImageKeyboardResponseBbox,
+    input_feedback_duration: 500,
+    // Nested timeline:  https://www.jspsych.org/overview/timeline/#nested-timelines
+    timeline: trials
+      .filter(trial => trial.type == "main")
+      //   .map(trial => randomize_lr(trial))
+      .map((trial) => ({
+        //   trial_progress_text: `Trial ${Number(trial.trial_number)} of ${num_trials}`,
+        // prompt: `How similar is ${trial.object}?`,
+        //   prompt: `How similar is PLACEHOLDER TEXT?`,
+        // image: rel_images_folder_path + '/' + trial.image_1,
+        // right_image: rel_images_folder_path + '/' + trial.image_2,
+        // color_coord: Object.values(JSON.parse(trial.color_coord.replace(/'/g, '"'))).map(x => x.toString()),
+        //   color_coord: trial.color_coord,
+        //   right_color: trial.coord2,
+        // audio: rel_audio_folder_path + '/' + 'image.mp3',
+        // right_audio: rel_audio_folder_path + '/' + 'right_image.mp3',
+        //   audio: rel_audio_folder_path + '/' + trial.music + ".mp3",
+        //   right_audio: rel_audio_folder_path + '/' + trial.music2 + ".mp3",
+        //   audio_start: 0,
+        //   right_audio_start: helper_minute_second(trial.start2),
+        //   audio_end: 15,
+        //   right_audio_end: helper_minute_second(trial.start2) + 15,
+        //   shape_image: trial.shape_image,
+        //   keys: trial.color.map((_, i) => `${i}`).concat(['4']),
+        //   labels: trial.color.concat(["I don'hear any music."]),
+        stimulus: rel_images_folder_path + '/' + trial.img_id + ".jpg",
+        choices: ['1', '2', '3', '4', '5', '6', '7'],
+        stimulus_bbox_ulx: Number.parseInt(trial.bbox0),
+        stimulus_bbox_uly: Number.parseInt(trial.bbox2),
+        stimulus_bbox_lrx: Number.parseInt(trial.bbox1),
+        stimulus_bbox_lry: Number.parseInt(trial.bbox3),
+        on_start: () => {
+          console.log("this trial", trial);
+          jsPsych.setProgressBar((Number(trial.trial_number) - 1) / num_trials);
+        },
+        on_finish: ({ rt, response }) => {
+          console.log("rt and response", rt, response);
+          const data = {
+            subj_code: worker_id,
+            choice_label: response,
+            choice_key: response,
+            rt,
+            ...trial,
+          };
 
-  //                 console.log("data at finish:", data);
+          console.log("data at finish:", data);
 
-  //                 api({
-  //                     fn: 'data',
-  //                     kwargs: {
-  //                         worker_id,
-  //                         data,
-  //                         order: Object.keys(data),
-  //                     },
-  //                 });
-  //             },
-  //         })),
-  // };
-  // timeline.push(image_trials_block);
+          api({
+            fn: 'data',
+            kwargs: {
+              worker_id,
+              data,
+              order: Object.keys(data),
+            },
+          });
+        },
+      })),
+  };
+  timeline.push(image_trials_block);
 
   // const demographics_questions_instructions = {
   //     type: 'instructions',
@@ -335,7 +345,7 @@ const { workerID: worker_id, fullscreen, reset, num_categories } = searchParams;
       <br>
       <center>Please copy/paste this code into the mTurk box'</center>
       <br>
-      If you have any questions or comments, please email qliu295@wisc.edu.`;
+      If you have any questions or comments, please email kesong.cao@wisc.edu.`;
     },
   };
   timeline.push(debrief_block);
