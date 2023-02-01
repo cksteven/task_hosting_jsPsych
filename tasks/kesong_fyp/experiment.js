@@ -3,7 +3,12 @@ import api from '../../utils/api.js';
 // import demographics_questions from './demograhpics.js';
 import searchParams from '../../utils/search-params.js';
 
-const { workerID: worker_id, fullscreen, reset, num_categories } = searchParams;
+const {
+  workerId: worker_id, // case sensitive, must be "workerId" for hosting on cloudresearch.com
+  fullscreen,
+  reset,
+  num_categories
+} = searchParams;
 
 
 (async () => {
@@ -61,7 +66,7 @@ const { workerID: worker_id, fullscreen, reset, num_categories } = searchParams;
   const continue_space = /* html */ `<div class='right small'>(press SPACE to continue)</div>`;
 
   // const qualtrics_link = "https://uwmadison.co1.qualtrics.com/jfe/form/SV_bJ9xVld2PXvp0ns?workerId=" + worker_id;
-  const qualtrics_link = "TBD";
+  const qualtrics_link = "https://uwmadison.co1.qualtrics.com/jfe/form/SV_0MMtnOOvZMmN9uS?workerId=" + worker_id;
 
 
   const instructions_assess = {
@@ -73,7 +78,7 @@ const { workerID: worker_id, fullscreen, reset, num_categories } = searchParams;
       <h1> Instruction and examples </h1>
 
       <p> In this experiment, you are asked to <b>rate object shapes</b>.
-      On a 1 to 7 scale, <b>1 being most round</b> and <b>7 being most spiky</b>,
+      On a 1 to 7 scale, <b>1 being least spiky (extremely round)</b> and <b>7 being extremely spiky (least round)</b>,
       please rate the shape of the object in each following image you see. </p>
 
       <p> Before you start the main task, we have a few examples to demostrate
@@ -84,6 +89,10 @@ const { workerID: worker_id, fullscreen, reset, num_categories } = searchParams;
       on your keyboard to select your rating.
       Please use your instinct to rate the object shape.
       If you are not sure, just go with whatever feels right.
+      </p>
+
+      <p>
+      Please do not refresh the page or use the back button on your browser.
       </p>
       `,
     ],
@@ -100,8 +109,8 @@ const { workerID: worker_id, fullscreen, reset, num_categories } = searchParams;
         type: jsPsychCustomImageKeyboardResponseBbox,
         prompt:
       /*html*/ trial.type === "assess1" ?
-            `<br /> This is an example of a <b>most round</b> object. Therefore please select <b>1</b> on the scale by pressing 1 on your keyboard.`
-            : `<br /> This is an example of a <b>most spiky</b> object. Therefore please select <b>7</b> on the scale by pressing 7 on your keyboard.`,
+            `<br /> This is an example of a <b>least spiky (extremely round)</b> object. Therefore please select <b>1</b> on the scale by pressing 1 on your keyboard.`
+            : `<br /> This is an example of a <b>extremely spiky (least round)</b> object. Therefore please select <b>7</b> on the scale by pressing 7 on your keyboard.`,
 
         stimulus: rel_images_folder_path + '/' + trial.img_id + ".jpg",
         choices: ['1', '2', '3', '4', '5', '6', '7'],
@@ -162,7 +171,7 @@ const { workerID: worker_id, fullscreen, reset, num_categories } = searchParams;
       In this experiment, you will see about 200 images.
       In each image, there is one main object bounded by a red rectangle.
       Your task is to <b>rate the object shape</b> on a 1 to 7 scale,
-      <b>1 being most round</b> and <b>7 being most spiky</b>.
+      <b>1 being least spiky (extremely round)</b> and <b>7 being extremely spiky (least round)</b>.
       </p>
 
       <p>
@@ -174,37 +183,18 @@ const { workerID: worker_id, fullscreen, reset, num_categories } = searchParams;
 
       <p>
       When you are done with this shape rating task, you will be taken to a survey.
-      Please make sure to carefully complete the ratings and the survey,
-      otherwise we might not approve your compensation.
-      </p>`,
+      Please make sure to carefully complete the ratings and the survey.
+      </p>
+
+      <p>
+      Please do not refresh the page or use the back button on your browser.
+      </p>
+      `,
     ],
     show_clickable_nav: true,
   };
   if (trials.length > 0) timeline.push(instructions);
 
-  // const rel_audio_folder_path = rel_images_folder_path;
-
-  const helper_minute_second = (minute_colon_second) => {
-    const minute = parseInt(minute_colon_second.split(":")[0]);
-    const second = parseInt(minute_colon_second.split(":")[1]);
-    const res = minute * 60 + second;
-    // console.log(minute, second, res);
-    return res;
-  }
-
-  const randomize_lr = (trial) => {
-    console.log("before lr rand:", trial);
-    // if (Math.random() >= 0.5) return trial;
-    let modified_trial = Object.assign({}, trial);
-    let color_coord = JSON.parse(trial.color_coord.replace(/'/g, '"'));
-    let new_colors = Object.keys(color_coord).sort(() => Math.random() - 0.5);
-    let new_coords = new_colors.map(key => color_coord[key].toString());
-    modified_trial.color = new_colors;
-    modified_trial.color_coord = new_coords;
-    console.log("after lr rand:", modified_trial);
-
-    return modified_trial;
-  }
 
   const image_trials_block = {
     type: jsPsychCustomImageKeyboardResponseBbox,
@@ -239,6 +229,16 @@ const { workerID: worker_id, fullscreen, reset, num_categories } = searchParams;
         stimulus_bbox_uly: Number.parseInt(trial.bbox2),
         stimulus_bbox_lrx: Number.parseInt(trial.bbox1),
         stimulus_bbox_lry: Number.parseInt(trial.bbox3),
+        prompt: `
+        <p>
+        1 is least spiky (extremely round). &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        7 is extremely spiky (least round).
+        </p>
+
+        <p>
+        Press the number key (1 to 7) on your keyboard to select your rating.
+        </p>
+        `,
         on_start: () => {
           console.log("this trial", trial);
           jsPsych.setProgressBar((Number(trial.trial_number) - 1) / num_trials);
