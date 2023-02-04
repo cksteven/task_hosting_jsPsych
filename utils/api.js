@@ -7,7 +7,7 @@ export default async (msg) => {
     .then((module) => {
       console.log("imported PORT", module.default);
       const PORT = module.default;
-      const ENDPOINT = `http://${window.location.hostname}:${PORT}`;
+      const ENDPOINT = `https://${window.location.hostname}:${PORT}`;
 
       const searchParams = new URLSearchParams(window.location.search);
       const dev = searchParams.get('dev') === 'true';

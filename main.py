@@ -137,10 +137,10 @@ if __name__ == "__main__":
     # something to aim for in the future, then switching from files
     # to a network database should be the first step to take because it will
     # allow transaction locks and get the most out of peformance of reads and writes.
-    if reload_enabled:
-        logger.info("App reload is enabled.")
-        # Reload
-        app.run(debug=True, port=port, threaded=False)
-    else:
-        logger.info("App reload is disabled.")
-        serve(TransLogger(app), host="0.0.0.0", port=port, threads=1)
+    # if reload_enabled:
+    logger.info("App reload is enabled.")
+    # Reload
+    app.run(debug=True, host="0.0.0.0", port=port, threaded=False, ssl_context=('vader_psych_wisc_edu.pem', 'plain.key'))
+    # else:
+    #     logger.info("App reload is disabled.")
+    #     serve(TransLogger(app), host="0.0.0.0", port=port, threads=1, url_scheme='https')
