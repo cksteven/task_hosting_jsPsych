@@ -1,0 +1,5 @@
+subj_code,choice_label,choice_key,rt,bbox0,bbox1,bbox2,bbox3,img_id,label,trial_number,type
+www,1,1,719,146,287,77,183,16_16405,insect,5,assess7
+www,1,1,7647,73,261,48,236,21_21432,ball,74,assess1
+www,1,1,821,44,245,144,326,52_52609,ornament,118,assess7
+www,1,1,687,28,273,250,324,15_15234,boat,119,assess7

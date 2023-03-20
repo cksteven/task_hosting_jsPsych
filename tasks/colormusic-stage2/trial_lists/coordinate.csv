@@ -1,0 +1,40 @@
+color,variation,x,y,Y,row,column
+red,Saturated,0.549,0.313,22.93,2,1
+red,Light,0.407,0.326,49.95,2,4
+red,Muted,0.441,0.324,22.93,5,4
+red,Dark,0.506,0.311,7.6,5,1
+orange,Saturated,0.513,0.412,49.95,2,2
+orange,Light,0.399,0.366,68.56,2,5
+orange,Muted,0.423,0.375,34.86,5,5
+orange,Dark,0.481,0.388,10.76,5,2
+yellow,Saturated,0.446,0.472,91.25,2,3
+yellow,Light,0.391,0.413,91.25,2,6
+yellow,Muted,0.407,0.426,49.95,5,6
+yellow,Dark,0.437,0.45,18.43,5,3
+chartreuse,Saturated,0.387,0.504,68.56,3,3
+chartreuse,Light,0.357,0.42,79.9,3,6
+chartreuse,Muted,0.36,0.436,42.4,6,6
+chartreuse,Dark,0.369,0.473,18.43,6,3
+green,Saturated,0.254,0.449,42.4,4,3
+green,Light,0.288,0.381,63.9,4,6
+green,Muted,0.281,0.392,34.86,7,6
+green,Dark,0.261,0.419,12.34,7,3
+cyan,Saturated,0.226,0.335,49.95,4,2
+cyan,Light,0.267,0.33,68.56,4,5
+cyan,Muted,0.254,0.328,34.86,7,5
+cyan,Dark,0.233,0.324,13.92,7,2
+blue,Saturated,0.2,0.23,34.86,4,1
+blue,Light,0.255,0.278,59.25,4,4
+blue,Muted,0.241,0.265,28.9,7,4
+blue,Dark,0.212,0.236,10.76,7,1
+purple,Saturated,0.272,0.156,18.43,3,1
+purple,Light,0.29,0.242,49.95,3,4
+purple,Muted,0.287,0.222,22.93,6,4
+purple,Dark,0.28,0.181,7.6,6,1
+achromatic,Black,0.31,0.316,0.3,1,3
+achromatic,Dark grgay,0.31,0.316,12.34,6,2
+achromatic,Med gray,0.31,0.316,31.88,3,2
+achromatic,Light gray,0.31,0.316,63.9,3,5
+achromatic,White,0.31,0.316,116,1,4
+achromatic,Med gray,0.31,0.316,31.88,6,5
+Background,gray,0.312,0.318,19.26,0,0
