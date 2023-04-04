@@ -118,7 +118,11 @@ class Task:
   def get_color_coords(self):
     coord_filename = "coordinate.csv"
     rows = read_rows(self.trial_lists_folder_path + '/' + coord_filename)
+    return rows
 
+  def get_music_list(self):
+    filename = "music_trials.csv"
+    rows = read_rows(self.trial_lists_folder_path + '/' + filename)
     return rows
 
   def add_type(self, row, type):
@@ -128,9 +132,9 @@ class Task:
   def generate_trials(self, worker_id, randomize_order=True):
     global_rows = []
 
-    list_filename = "music_trials.csv"
-    rows = read_rows(self.trial_lists_folder_path + '/' + list_filename)
-    rows = [{'type': 'colormusic', 'content': row} for row in rows]
+    music_list = self.get_music_list()
+
+    rows = [{'type': 'colormusic', 'content': row} for row in music_list]
     global_rows += rows
 
     color_coords = self.get_color_coords()
@@ -143,7 +147,7 @@ class Task:
 
     list_filename = "anchors_semantic_ratings.csv"
     rows = read_rows(self.trial_lists_folder_path + '/' + list_filename)
-    rows = [{'type': 'music', 'content': {'anchors': row, 'color': color}} for color in color_coords for row in rows]
+    rows = [{'type': 'music', 'content': {'anchors': row, 'music': music}} for music in music_list for row in rows]
     global_rows += rows
 
     if randomize_order:

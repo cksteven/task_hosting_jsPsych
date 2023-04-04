@@ -14,7 +14,8 @@ const {
   workerId: worker_id,
   fullscreen,
   reset,
-  num_categories
+  num_categories,
+  dev,
 } = searchParams;
 
 
@@ -33,6 +34,10 @@ const {
     fn: 'trials',
     kwargs: { worker_id, reset, num_categories },
   });
+
+
+  console.log("ALL TRIALS", trials);
+
 
   const timeline = [];
 
@@ -71,45 +76,14 @@ const {
     return `rgb(${r}, ${g}, ${b})`
   };
 
-  const coloralign_trials = {
-    type: jsPsychHtmlSliderResponse,
-
-    timeline: trials.filter(trial => trial.type == "color").map((trial) => ({
-      type: jsPsychHtmlSliderResponse,
-      stimulus: `<div style="
-        height: 300px;
-        width: 300px;
-        background-color: ${coords2rgb(trial.content.color)};
-      "></div>`,
-      labels: [trial.content.anchors.anchor1, trial.content.anchors.anchor2],
-      prompt: `
-      <p> TEST PROMPT </p>
-      `,
-      on_start: () => {
-        console.log("DEBUG: trials", trial);
-      },
-      on_finish: ({ rt, response }) => {
-        console.log("rt and response", rt, response);
-        const data = {
-          subj_code: worker_id,
-          response: response,
-          rt,
-          trial,
-        };
-
-        api({
-          fn: 'data',
-          kwargs: {
-            worker_id,
-            data,
-            order: Object.keys(data),
-          },
-        });
-      },
-    })),
-  };
-
-  timeline.push(coloralign_trials);
+  var sliceIfDev = function (arr, num2keep = 3) {
+    console.log("DEV", dev);
+    if (dev == true) {
+      return arr.slice(0, num2keep);
+    } else {
+      return arr
+    }
+  }
 
   const consent_trial = {
     type: jsPsychCustomConsent,
@@ -126,7 +100,7 @@ const {
 
   if (!consent_agreed) timeline.push(consent_trial);
 
-  const qualtrics_link = "https://uwmadison.co1.qualtrics.com/jfe/form/SV_bJ9xVld2PXvp0ns?workerId=" + worker_id;
+  const qualtrics_link = "https://uwmadison.co1.qualtrics.com/jfe/form/SV_9BQ9kjJqZR5FUrQ?workerId=" + worker_id;
 
   const instructions = {
     type: jsPsychInstructions,
@@ -151,7 +125,8 @@ const {
   const colorboard_trials = {
     type: jsPsychCustomColorboard,
 
-    timeline: trials.filter(trial => trial.type == "colormusic").map((trial) => ({
+    timeline: sliceIfDev(trials.filter(trial => trial.type == "colormusic"))
+      .map((trial) => ({
       type: jsPsychCustomColorboard,
       color_coords: color_coords,
       audio: rel_audio_folder_path + "/" + trial.content.stimulus + ".mp3",
@@ -193,91 +168,85 @@ const {
 
   timeline.push(colorboard_trials);
 
-  const helper_minute_second = (minute_colon_second) => {
-    const minute = parseInt(minute_colon_second.split(":")[0]);
-    const second = parseInt(minute_colon_second.split(":")[1]);
-    const res = minute * 60 + second;
-    // console.log(minute, second, res);
-    return res;
-  }
 
-  const randomize_lr = (trial) => {
-    console.log("before lr rand:", trial);
-    // if (Math.random() >= 0.5) return trial;
-    let modified_trial = Object.assign({}, trial);
-    let color_coord = JSON.parse(trial.color_coord.replace(/'/g, '"'));
-    let new_colors = Object.keys(color_coord).sort(() => Math.random() - 0.5);
-    let new_coords = new_colors.map(key => color_coord[key].toString());
-    modified_trial.color = new_colors;
-    modified_trial.color_coord = new_coords;
-    console.log("after lr rand:", modified_trial);
-    //     // swap color1,color2,coord1,coord2,music1,music2,start1,start2
-    //     modified_trial.color1 = trial.color2;
-    //     modified_trial.color2 = trial.color1;
-    //     modified_trial.coord1 = trial.coord2;
-    //     modified_trial.coord2 = trial.coord1;
-    //     modified_trial.music1 = trial.music2;
-    //     modified_trial.music2 = trial.music1;
-    //     modified_trial.start1 = trial.start2;
-    //     modified_trial.start2 = trial.start1;
-    //     console.log("one trial was LEFT-RIGHT SWAPPED from source trial list data");
+  const coloralign_trials = {
+    type: jsPsychHtmlSliderResponse,
 
-    return modified_trial;
-  }
+    timeline: sliceIfDev(trials.filter(trial => trial.type == "color"))
+      .map((trial) => ({
+      type: jsPsychHtmlSliderResponse,
+      stimulus: `<div style="
+        height: 300px;
+        width: 300px;
+        background-color: ${coords2rgb(trial.content.color)};
+      "></div>`,
+      labels: [trial.content.anchors.anchor1, trial.content.anchors.anchor2],
+      prompt: `
+      <p> TEST PROMPT </p>
+      `,
+      on_start: () => {
+        console.log("DEBUG: trials", trial);
+      },
+      on_finish: ({ rt, response }) => {
+        console.log("rt and response", rt, response);
+        const data = {
+          subj_code: worker_id,
+          response: response,
+          rt,
+          trial,
+        };
 
-  // const image_trials_block = {
-  //     type: 'lupyanlab-image-similarity-with-audio',
-  //     input_feedback_duration: 500,
-  //     // Nested timeline:  https://www.jspsych.org/overview/timeline/#nested-timelines
-  //     timeline: trials
-  //         .filter(trial => trial.type != "assess")
-  //         .map(trial => randomize_lr(trial))
-  //         .map((trial) => ({
-  //             //   trial_progress_text: `Trial ${Number(trial.trial_number)} of ${num_trials}`,
-  //             // prompt: `How similar is ${trial.object}?`,
-  //             //   prompt: `How similar is PLACEHOLDER TEXT?`,
-  //             // image: rel_images_folder_path + '/' + trial.image_1,
-  //             // right_image: rel_images_folder_path + '/' + trial.image_2,
-  //             // color_coord: Object.values(JSON.parse(trial.color_coord.replace(/'/g, '"'))).map(x => x.toString()),
-  //             color_coord: trial.color_coord,
-  //             //   right_color: trial.coord2,
-  //             // audio: rel_audio_folder_path + '/' + 'image.mp3',
-  //             // right_audio: rel_audio_folder_path + '/' + 'right_image.mp3',
-  //             audio: rel_audio_folder_path + '/' + trial.music + ".mp3",
-  //             //   right_audio: rel_audio_folder_path + '/' + trial.music2 + ".mp3",
-  //             audio_start: 0,
-  //             //   right_audio_start: helper_minute_second(trial.start2),
-  //             audio_end: 15,
-  //             //   right_audio_end: helper_minute_second(trial.start2) + 15,
-  //             //   shape_image: trial.shape_image,
-  //             keys: trial.color.map((_, i) => `${i}`).concat(['4']),
-  //             labels: trial.color.concat(["I don'hear any music."]),
-  //             on_start: () => {
-  //                 jsPsych.setProgressBar((Number(trial.trial_number) - 1) / num_trials);
-  //             },
-  //             on_finish: ({ rt, key, label }) => {
-  //                 const data = {
-  //                     subj_code: worker_id,
-  //                     choice_label: label,
-  //                     choice_key: key,
-  //                     rt,
-  //                     ...trial,
-  //                 };
+        api({
+          fn: 'data',
+          kwargs: {
+            worker_id,
+            data,
+            order: Object.keys(data),
+          },
+        });
+      },
+    })),
+  };
 
-  //                 console.log("data at finish:", data);
+  timeline.push(coloralign_trials);
 
-  //                 api({
-  //                     fn: 'data',
-  //                     kwargs: {
-  //                         worker_id,
-  //                         data,
-  //                         order: Object.keys(data),
-  //                     },
-  //                 });
-  //             },
-  //         })),
-  // };
-  // timeline.push(image_trials_block);
+  const musicalign_trials = {
+    type: jsPsychCustomAudioSliderResponse,
+
+    timeline: sliceIfDev(trials.filter(trial => trial.type == "music"))
+      .map((trial) => ({
+      type: jsPsychCustomAudioSliderResponse,
+      stimulus: `${rel_audio_folder_path}/${trial.content.music.stimulus}.mp3`,
+      labels: [trial.content.anchors.anchor1, trial.content.anchors.anchor2],
+      prompt: `
+      <p> TEST PROMPT </p>
+      `,
+      on_start: () => {
+        console.log("DEBUG: trials", trial);
+      },
+      on_finish: ({ rt, response }) => {
+        console.log("rt and response", rt, response);
+        const data = {
+          subj_code: worker_id,
+          response: response,
+          rt,
+          trial,
+        };
+
+        api({
+          fn: 'data',
+          kwargs: {
+            worker_id,
+            data,
+            order: Object.keys(data),
+          },
+        });
+      },
+    })),
+  };
+
+  timeline.push(musicalign_trials);
+
 
   // const demographics_questions_instructions = {
   //     type: 'instructions',
@@ -317,7 +286,7 @@ const {
       }, 7000);
     }
   }
-  // timeline.push(jump_to_qualtrics);
+  timeline.push(jump_to_qualtrics);
 
 
 
