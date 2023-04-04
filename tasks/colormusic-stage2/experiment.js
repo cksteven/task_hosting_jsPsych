@@ -59,7 +59,7 @@ const {
   const colorboard_trials = {
     type: jsPsychCustomColorboard,
 
-    timeline: [0].map((trial) => ({
+    timeline: trials.map((trial) => ({
       type: jsPsychCustomColorboard,
       color_coords: color_coords,
       colorjs: Color,
@@ -71,23 +71,10 @@ const {
         console.log("rt and response", rt, response);
         const data = {
           subj_code: worker_id,
-          choice_label: response,
-          choice_key: response,
+          response: response,
           rt,
-          ...trial,
+          trial,
         };
-
-        // return api({
-        //   fn: 'data',
-        //   kwargs: {
-        //     worker_id,
-        //     data: {
-        //       response: button_pressed,
-        //       rt: rt,
-        //       ...trial,
-        //     },
-        //   },
-        // });
 
         api({
           fn: 'data',
@@ -161,26 +148,13 @@ const {
           jsPsych.setProgressBar((Number(trial.trial_number) - 1) / num_trials);
         },
         on_finish: ({ rt, response }) => {
-          console.log("???", rt, response);
           const data = {
             subj_code: worker_id,
             choice_label: response,
-            choice_key: response,
+            response: response,
             rt,
             ...trial,
           };
-
-          // return api({
-          //   fn: 'data',
-          //   kwargs: {
-          //     worker_id,
-          //     data: {
-          //       response: button_pressed,
-          //       rt: rt,
-          //       ...trial,
-          //     },
-          //   },
-          // });
 
           api({
             fn: 'data',

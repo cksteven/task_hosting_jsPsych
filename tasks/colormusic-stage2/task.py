@@ -48,6 +48,7 @@ class Task:
     data_file_path = self.data_folder_path + '/' + worker_id + '.csv'
 
     color_coords = self.get_color_coords()
+    # music_list = self.get_music_list()
 
     if reset or not os.path.exists(trials_file_path):
       remove_files(demographics_file_path, consent_file_path, data_file_path, trials_file_path)
@@ -56,16 +57,16 @@ class Task:
       # testoutput.write("????")
       # testoutput.close()
 
-      # trials = self.generate_trials(worker_id, num_categories)
-      trials = []
+      trials = self.get_music_list(worker_id)
+      # trials = []
       num_trials = len(trials)
       write_to_csv(trials_file_path, trials)
       completed_demographics = False
       consent_agreed = False
 
     else:
-      # trials = read_rows(trials_file_path)
-      trials = []
+      trials = self.get_music_list(worker_id)
+      # trials = []
       num_trials = len(trials)
       if os.path.exists(data_file_path):
         data = read_rows(data_file_path)
@@ -119,6 +120,20 @@ class Task:
     rows = read_rows(self.trial_lists_folder_path + '/' + coord_filename)
 
     return rows
+
+  def get_music_list(self, worker_id, randomize_order=True):
+    list_filename = "music_trials.csv"
+    rows = read_rows(self.trial_lists_folder_path + '/' + list_filename)
+
+    if randomize_order:
+      random.shuffle(rows)
+
+    trials = [
+        dict({'trial_number': index + 1}, **row) for index, row in enumerate(rows)
+    ]
+
+    return trials
+
 
 
   def generate_trials(self, worker_id, num_categories=None, randomize_order=True):

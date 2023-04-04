@@ -171,3 +171,7 @@ modules/
 # ## Hide Tasks
 # tasks/*
 # !tasks/rate_pointiness/
+
+
+*.pid
+prod/
