@@ -150,6 +150,11 @@ class Task:
     rows = [{'type': 'music', 'content': {'anchors': row, 'music': music}} for music in music_list for row in rows]
     global_rows += rows
 
+    list_filename = "music_matching_stimuli.csv"
+    rows = read_rows(self.trial_lists_folder_path + '/' + list_filename)
+    rows = [{'type': 'musicmusic', 'content': row} for row in rows]
+    global_rows += rows
+
     if randomize_order:
       random.shuffle(global_rows)
 

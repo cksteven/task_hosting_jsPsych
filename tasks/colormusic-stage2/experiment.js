@@ -49,7 +49,7 @@ const {
   timeline.push(preload);
 
   const rel_audio_folder_path = './music_short';
-  const rel_audiocheck_path = './audiocheck';
+  const rel_second_audio_folder_path = './control_task_music';
 
   const fullscreen_trial = {
     type: jsPsychFullscreen,
@@ -84,6 +84,9 @@ const {
       return arr
     }
   }
+
+
+
 
   const consent_trial = {
     type: jsPsychCustomConsent,
@@ -121,6 +124,45 @@ const {
   if (trials.length > 0) timeline.push(instructions);
 
   // const rel_audio_folder_path = rel_images_folder_path;
+
+  const musicmusic_trials = {
+    type: jsPsychCustomMusicmusic,
+
+    timeline: sliceIfDev(trials.filter(trial => trial.type == "musicmusic"))
+      .map((trial) => ({
+      type: jsPsychCustomMusicmusic,
+      audio: rel_second_audio_folder_path + "/" + trial.content.music + ".mp3",
+      audio2: rel_second_audio_folder_path + "/" + trial.content.like + ".mp3",
+      audio3: rel_second_audio_folder_path + "/" + trial.content.dislike + ".mp3",
+      prompt: `
+      <h1> TEST TITLE </h1>
+      <p> TEST PROMPT </p>
+      `,
+      on_start: () => {
+        console.log("DEBUG: trials", trial);
+      },
+      on_finish: ({ rt, response }) => {
+        console.log("rt and response", rt, response);
+        const data = {
+          subj_code: worker_id,
+          response: response,
+          rt,
+          trial,
+        };
+
+        api({
+          fn: 'data',
+          kwargs: {
+            worker_id,
+            data,
+            order: Object.keys(data),
+          },
+        });
+      },
+    })),
+  };
+
+  timeline.push(musicmusic_trials);
 
   const colorboard_trials = {
     type: jsPsychCustomColorboard,
