@@ -40,6 +40,7 @@ const {
     type: jsPsychPreload,
     auto_preload: true
   }
+
   timeline.push(preload);
 
   const rel_audio_folder_path = './music_short';
@@ -56,12 +57,38 @@ const {
 
   // const dev = true;
 
+  const consent_trial = {
+    type: jsPsychCustomConsent,
+    url: './consent.html',
+    alert:
+      'If you wish to participate, you must check the box next to the statement "I agree to participate in this study."',
+    on_finish: () => {
+      api({ fn: 'consent', kwargs: { worker_id } });
+    },
+    on_start: () => {
+      console.log("DEBUG: trials", trials);
+    }
+  };
+
+  if (!consent_agreed) timeline.push(consent_trial);
+
   const colorboard_trials = {
     type: jsPsychCustomColorboard,
 
     timeline: trials.map((trial) => ({
       type: jsPsychCustomColorboard,
       color_coords: color_coords,
+      audio: rel_audio_folder_path + "/" + trial.stimulus + ".mp3",
+      prompt: `
+      <h1> TEST TITLE </h1>
+      <p> TEST PROMPT </p>
+      `,
+      promptA: `
+      <p> Select 3 colors that you think are the MOST aligned to the music. </p>
+      `,
+      promptB: `
+      <p> Select 3 colors that you think are the LEAST aligned to the music. </p>
+      `,
       colorjs: Color,
       // konvajs: Konva,
       on_start: () => {
@@ -87,23 +114,8 @@ const {
       },
     })),
   };
+
   timeline.push(colorboard_trials);
-
-
-  const consent_trial = {
-    type: jsPsychCustomConsent,
-    url: './consent.html',
-    alert:
-      'If you wish to participate, you must check the box next to the statement "I agree to participate in this study."',
-    on_finish: () => {
-      api({ fn: 'consent', kwargs: { worker_id } });
-    },
-    on_start: () => {
-      console.log("DEBUG: trials", trials);
-    }
-  };
-
-  // if (!consent_agreed) timeline.push(consent_trial);
 
   const continue_space = /* html */ `<div class='right small'>(press SPACE to continue)</div>`;
 

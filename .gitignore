@@ -175,3 +175,4 @@ modules/
 
 *.pid
 prod/
+*.mp3

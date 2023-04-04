@@ -5,7 +5,7 @@ export default async (msg) => {
   const PORTFILEPATH = `../tasks/${task}/port.js`;
   return import(PORTFILEPATH)
     .then((module) => {
-      console.log("imported PORT", module.default);
+    //   console.log("imported PORT", module.default);
       const PORT = module.default;
       const ENDPOINT = `https://${window.location.hostname}:${PORT}`;
 
