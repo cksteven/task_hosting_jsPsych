@@ -221,7 +221,8 @@ const {
       .map((trial) => ({
         type: jsPsychCustomAudioSliderResponse,
         stimulus: `${rel_audio_folder_path}/${trial.content.music.stimulus}.mp3`,
-        labels: [trial.content.anchors.anchor1, trial.content.anchors.anchor2],
+        labels: [trial.content.anchors[0].anchor1, trial.content.anchors[0].anchor2],
+        labels_mul: trial.content.anchors.map(anchor => [anchor.anchor1, anchor.anchor2]),
         require_movement: true,
         prompt: `
       <p> TEST PROMPT </p>
