@@ -57,6 +57,60 @@ const {
 
   // const dev = true;
 
+  var xyY2XYZ = function (x, y, Y) {
+    var X = (x / y) * Y;
+    var Z = ((1 - x - y) / y) * Y;
+    return [X / 100., Y / 100., Z / 100.];
+  };
+
+  var coords2rgb = function (coord) {
+    var curr_color = new Color("color(xyz-d65 " + xyY2XYZ(coord.x, coord.y, coord.Y).join(" ") + ")").to("srgb");
+    const r = parseInt(curr_color.r * 256);
+    const g = parseInt(curr_color.g * 256);
+    const b = parseInt(curr_color.b * 256);
+    return `rgb(${r}, ${g}, ${b})`
+  };
+
+  const coloralign_trials = {
+    type: jsPsychHtmlSliderResponse,
+
+    timeline: trials.filter(trial => trial.type == "color").map((trial) => ({
+      type: jsPsychHtmlSliderResponse,
+      stimulus: `<div style="
+        height: 300px;
+        width: 300px;
+        background-color: ${coords2rgb(trial.content.color)};
+      "></div>`,
+      labels: [trial.content.anchors.anchor1, trial.content.anchors.anchor2],
+      prompt: `
+      <p> TEST PROMPT </p>
+      `,
+      on_start: () => {
+        console.log("DEBUG: trials", trial);
+      },
+      on_finish: ({ rt, response }) => {
+        console.log("rt and response", rt, response);
+        const data = {
+          subj_code: worker_id,
+          response: response,
+          rt,
+          trial,
+        };
+
+        api({
+          fn: 'data',
+          kwargs: {
+            worker_id,
+            data,
+            order: Object.keys(data),
+          },
+        });
+      },
+    })),
+  };
+
+  timeline.push(coloralign_trials);
+
   const consent_trial = {
     type: jsPsychCustomConsent,
     url: './consent.html',
@@ -72,13 +126,35 @@ const {
 
   if (!consent_agreed) timeline.push(consent_trial);
 
+  const qualtrics_link = "https://uwmadison.co1.qualtrics.com/jfe/form/SV_bJ9xVld2PXvp0ns?workerId=" + worker_id;
+
+  const instructions = {
+    type: jsPsychInstructions,
+    key_forward: 'space',
+    key_backward: 'backspace',
+    show_clickable_nav: true,
+    pages: [
+      /* html */ `
+      <h1> Instruction TO CHANGE </h1>
+
+      <p class="lead">In this experiment, you will hear about 20 short music clips. While listening to each one, you will see four colors. Your task is to choose the color that most goes with the music piece that is currently playing. You need to hear each piece until the end and can only make a selection at the end of the piece. Pay careful attention as sometimes you may be instructed to make a specific selection.
+      </p> <p class="lead"> If you are not sure what color to choose, just go with whatever feels right.
+      </p> <p class="lead">To hear each music piece, click on the sound icon. You can replay it by clicking it again, if you like.
+      </p> <p class="lead">When you are done with this color selection task, you will be taken to a survey. Please make sure to carefully complete the survey, otherwise your research credit may not be approved.
+        </p>`,
+    ],
+  };
+  if (trials.length > 0) timeline.push(instructions);
+
+  // const rel_audio_folder_path = rel_images_folder_path;
+
   const colorboard_trials = {
     type: jsPsychCustomColorboard,
 
-    timeline: trials.map((trial) => ({
+    timeline: trials.filter(trial => trial.type == "colormusic").map((trial) => ({
       type: jsPsychCustomColorboard,
       color_coords: color_coords,
-      audio: rel_audio_folder_path + "/" + trial.stimulus + ".mp3",
+      audio: rel_audio_folder_path + "/" + trial.content.stimulus + ".mp3",
       prompt: `
       <h1> TEST TITLE </h1>
       <p> TEST PROMPT </p>
@@ -116,90 +192,6 @@ const {
   };
 
   timeline.push(colorboard_trials);
-
-  const continue_space = /* html */ `<div class='right small'>(press SPACE to continue)</div>`;
-
-  const qualtrics_link = "https://uwmadison.co1.qualtrics.com/jfe/form/SV_bJ9xVld2PXvp0ns?workerId=" + worker_id;
-
-  const instructions_assess = {
-    type: jsPsychInstructions,
-    pages: [
-      /* html */ `
-      <h1> TEXT TO BE CHANGED</h1>
-      <p> Before you start the main task, we have a few example questions to demostrate what is a typical round or spiky object.</p>
-
-      <p>
-      Before you start the main task, we have four short <b>audio questions</b> to make sure you speak English well enough to participate.
-      </p><p>
-      These questions are very easy, but you will need to <b>turn up the sound on your computer</b> to be able to hear the questions.
-      </p><p>
-      Please make sure you answer these four questions correctly. If you answer incorrectly we may not compensate you for your participation.
-      </p>
-      `,
-    ],
-    show_clickable_nav: true,
-  };
-  // if (trials.length > 0) timeline.push(instructions_assess);
-
-  const assess_block = {
-    type: jsPsychAudioButtonResponse,
-    input_feedback_duration: 500,
-    timeline: trials
-      .filter(trial => trial.type === "assess")
-      .map((trial) => ({
-        type: jsPsychAudioButtonResponse,
-        prompt:
-      /*html*/ `<br>This is an <b>audio question</b>, please make sure the sound on your computer is on.<br>
-      To replay the question, <b>press R</b> on your keyboard.`,
-
-        stimulus: rel_audiocheck_path + '/' + trial.music + ".mp3",
-        choices: trial.color.split(','),
-
-        questions: [{ prompt: '', name: '', rows: 1, columns: 30, required: true }],
-        on_start: () => {
-          jsPsych.setProgressBar((Number(trial.trial_number) - 1) / num_trials);
-        },
-        on_finish: ({ rt, response }) => {
-          const data = {
-            subj_code: worker_id,
-            choice_label: response,
-            response: response,
-            rt,
-            ...trial,
-          };
-
-          api({
-            fn: 'data',
-            kwargs: {
-              worker_id,
-              data,
-              order: Object.keys(data),
-            },
-          });
-        },
-      })),
-  };
-  // timeline.push(assess_block);
-
-
-  const instructions = {
-    type: jsPsychInstructions,
-    key_forward: 'space',
-    key_backward: 'backspace',
-    pages: [
-      /* html */ `
-      <h1> Instruction </h1>
-
-      <p class="lead">In this experiment, you will hear about 20 short music clips. While listening to each one, you will see four colors. Your task is to choose the color that most goes with the music piece that is currently playing. You need to hear each piece until the end and can only make a selection at the end of the piece. Pay careful attention as sometimes you may be instructed to make a specific selection.
-      </p> <p class="lead"> If you are not sure what color to choose, just go with whatever feels right.
-      </p> <p class="lead">To hear each music piece, click on the sound icon. You can replay it by clicking it again, if you like.
-      </p> <p class="lead">When you are done with this color selection task, you will be taken to a survey. Please make sure to carefully complete the survey, otherwise your research credit may not be approved.
-        </p> ${continue_space}`,
-    ],
-  };
-  // if (trials.length > 0) timeline.push(instructions);
-
-  // const rel_audio_folder_path = rel_images_folder_path;
 
   const helper_minute_second = (minute_colon_second) => {
     const minute = parseInt(minute_colon_second.split(":")[0]);

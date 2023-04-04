@@ -57,7 +57,7 @@ class Task:
       # testoutput.write("????")
       # testoutput.close()
 
-      trials = self.get_music_list(worker_id)
+      trials = self.generate_trials(worker_id)
       # trials = []
       num_trials = len(trials)
       write_to_csv(trials_file_path, trials)
@@ -65,7 +65,7 @@ class Task:
       consent_agreed = False
 
     else:
-      trials = self.get_music_list(worker_id)
+      trials = self.generate_trials(worker_id)
       # trials = []
       num_trials = len(trials)
       if os.path.exists(data_file_path):
@@ -121,70 +121,36 @@ class Task:
 
     return rows
 
-  def get_music_list(self, worker_id, randomize_order=True):
+  def add_type(self, row, type):
+    row["type"] = type
+    return row
+
+  def generate_trials(self, worker_id, randomize_order=True):
+    global_rows = []
+
     list_filename = "music_trials.csv"
     rows = read_rows(self.trial_lists_folder_path + '/' + list_filename)
+    rows = [{'type': 'colormusic', 'content': row} for row in rows]
+    global_rows += rows
+
+    color_coords = self.get_color_coords()
+    color_coords = [row for row in color_coords if row['color'] != 'Background']
+
+    list_filename = "anchors_semantic_ratings.csv"
+    rows = read_rows(self.trial_lists_folder_path + '/' + list_filename)
+    rows = [{'type': 'color', 'content': {'anchors': row, 'color': color}} for color in color_coords for row in rows]
+    global_rows += rows
+
+    list_filename = "anchors_semantic_ratings.csv"
+    rows = read_rows(self.trial_lists_folder_path + '/' + list_filename)
+    rows = [{'type': 'music', 'content': {'anchors': row, 'color': color}} for color in color_coords for row in rows]
+    global_rows += rows
 
     if randomize_order:
-      random.shuffle(rows)
+      random.shuffle(global_rows)
 
     trials = [
-        dict({'trial_number': index + 1}, **row) for index, row in enumerate(rows)
+        dict({'trial_number': index + 1}, **row) for index, row in enumerate(global_rows)
     ]
 
-    return trials
-
-
-
-  def generate_trials(self, worker_id, num_categories=None, randomize_order=True):
-    trial_lists = os.listdir(self.trial_lists_folder_path)
-    trial_list = get_next_min_key(update_images_counts_file_lock, self.trial_list_counts_file_path,
-                                  trial_lists)
-
-
-    # testoutput = open(dirname + '/' + 'DEBUG_trials_path.txt', 'w')
-    # testoutput.write(self.trial_lists_folder_path + '/' + trial_list)
-    # testoutput.close()
-
-    trial_list_rows = read_rows(self.trial_lists_folder_path + '/' + trial_list)
-
-    # tempfile = open(self.trial_lists_folder_path + '/' + trial_list, "rb")
-    # temprows = csv.DictReader(tempfile)
-    # tempfile.close()
-    # testoutput = open(dirname + '/' + 'DEBUG_trials_content_temp.txt', 'w')
-    # testoutput.write('    '.join(list(temprows)))
-    # testoutput.close()
-
-    # tempfile = open(self.trial_lists_folder_path + '/' + trial_list, "rb")
-    # temprows = list(csv.DictReader(tempfile))
-    # tempfile.close()
-    # testoutput = open(dirname + '/' + 'DEBUG_trials_content_temp.txt', 'w')
-    # testoutput.write(str(temprows))
-    # testoutput.close()
-
-    # testoutput = open(dirname + '/' + 'DEBUG_trials_content.txt', 'w')
-    # testoutput.write(str(list(trial_list_rows)))
-    # testoutput.close()
-
-    if randomize_order:
-    #   # trials_by_object = defaultdict(list)
-    #   # for trial_row in trial_list_rows:
-    #   #   trials_by_object[trial_row["object"]].append(trial_row)
-    #   # trial_list_rows_nested = trials_by_object.values()
-    #   # random.shuffle(trial_list_rows_nested)
-    #   # trial_list_rows = []
-    #   # for nested_trial_rows in trial_list_rows_nested:
-    #   #   random.shuffle(nested_trial_rows)
-    #   #   trial_list_rows.extend(nested_trial_rows)
-
-      # the part on randomizing left and right is in `experiment.js`
-      random.shuffle(trial_list_rows)
-
-    trials = [
-        dict({'trial_number': index + 1}, **row) for index, row in enumerate(trial_list_rows)
-    ]
-
-    # testoutput = open(dirname + '/' + 'DEBUG_trials_generated.txt', 'w')
-    # testoutput.write(str(trials))
-    # testoutput.close()
     return trials
