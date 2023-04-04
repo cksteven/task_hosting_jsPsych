@@ -125,87 +125,48 @@ const {
 
   // const rel_audio_folder_path = rel_images_folder_path;
 
-  const musicmusic_trials = {
-    type: jsPsychCustomMusicmusic,
-
-    timeline: sliceIfDev(trials.filter(trial => trial.type == "musicmusic"))
-      .map((trial) => ({
-      type: jsPsychCustomMusicmusic,
-      audio: rel_second_audio_folder_path + "/" + trial.content.music + ".mp3",
-      audio2: rel_second_audio_folder_path + "/" + trial.content.like + ".mp3",
-      audio3: rel_second_audio_folder_path + "/" + trial.content.dislike + ".mp3",
-      prompt: `
-      <h1> TEST TITLE </h1>
-      <p> TEST PROMPT </p>
-      `,
-      on_start: () => {
-        console.log("DEBUG: trials", trial);
-      },
-      on_finish: ({ rt, response }) => {
-        console.log("rt and response", rt, response);
-        const data = {
-          subj_code: worker_id,
-          response: response,
-          rt,
-          trial,
-        };
-
-        api({
-          fn: 'data',
-          kwargs: {
-            worker_id,
-            data,
-            order: Object.keys(data),
-          },
-        });
-      },
-    })),
-  };
-
-  timeline.push(musicmusic_trials);
-
   const colorboard_trials = {
     type: jsPsychCustomColorboard,
 
     timeline: sliceIfDev(trials.filter(trial => trial.type == "colormusic"))
       .map((trial) => ({
-      type: jsPsychCustomColorboard,
-      color_coords: color_coords,
-      audio: rel_audio_folder_path + "/" + trial.content.stimulus + ".mp3",
-      prompt: `
+        type: jsPsychCustomColorboard,
+        color_coords: color_coords,
+        audio: rel_audio_folder_path + "/" + trial.content.stimulus + ".mp3",
+        prompt: `
       <h1> TEST TITLE </h1>
       <p> TEST PROMPT </p>
       `,
-      promptA: `
+        promptA: `
       <p> Select 3 colors that you think are the MOST aligned to the music. </p>
       `,
-      promptB: `
+        promptB: `
       <p> Select 3 colors that you think are the LEAST aligned to the music. </p>
       `,
-      colorjs: Color,
-      // konvajs: Konva,
-      on_start: () => {
-        console.log("DEBUG: trials", trial);
-      },
-      on_finish: ({ rt, response }) => {
-        console.log("rt and response", rt, response);
-        const data = {
-          subj_code: worker_id,
-          response: response,
-          rt,
-          trial,
-        };
+        colorjs: Color,
+        // konvajs: Konva,
+        on_start: () => {
+          console.log("DEBUG: trials", trial);
+        },
+        on_finish: ({ rt, response }) => {
+          console.log("rt and response", rt, response);
+          const data = {
+            subj_code: worker_id,
+            response: response,
+            rt,
+            trial,
+          };
 
-        api({
-          fn: 'data',
-          kwargs: {
-            worker_id,
-            data,
-            order: Object.keys(data),
-          },
-        });
-      },
-    })),
+          api({
+            fn: 'data',
+            kwargs: {
+              worker_id,
+              data,
+              order: Object.keys(data),
+            },
+          });
+        },
+      })),
   };
 
   timeline.push(colorboard_trials);
@@ -216,38 +177,39 @@ const {
 
     timeline: sliceIfDev(trials.filter(trial => trial.type == "color"))
       .map((trial) => ({
-      type: jsPsychHtmlSliderResponse,
-      stimulus: `<div style="
+        type: jsPsychHtmlSliderResponse,
+        stimulus: `<div style="
         height: 300px;
         width: 300px;
         background-color: ${coords2rgb(trial.content.color)};
       "></div>`,
-      labels: [trial.content.anchors.anchor1, trial.content.anchors.anchor2],
-      prompt: `
+        labels: [trial.content.anchors.anchor1, trial.content.anchors.anchor2],
+        require_movement: true,
+        prompt: `
       <p> TEST PROMPT </p>
       `,
-      on_start: () => {
-        console.log("DEBUG: trials", trial);
-      },
-      on_finish: ({ rt, response }) => {
-        console.log("rt and response", rt, response);
-        const data = {
-          subj_code: worker_id,
-          response: response,
-          rt,
-          trial,
-        };
+        on_start: () => {
+          console.log("DEBUG: trials", trial);
+        },
+        on_finish: ({ rt, response }) => {
+          console.log("rt and response", rt, response);
+          const data = {
+            subj_code: worker_id,
+            response: response,
+            rt,
+            trial,
+          };
 
-        api({
-          fn: 'data',
-          kwargs: {
-            worker_id,
-            data,
-            order: Object.keys(data),
-          },
-        });
-      },
-    })),
+          api({
+            fn: 'data',
+            kwargs: {
+              worker_id,
+              data,
+              order: Object.keys(data),
+            },
+          });
+        },
+      })),
   };
 
   timeline.push(coloralign_trials);
@@ -257,37 +219,77 @@ const {
 
     timeline: sliceIfDev(trials.filter(trial => trial.type == "music"))
       .map((trial) => ({
-      type: jsPsychCustomAudioSliderResponse,
-      stimulus: `${rel_audio_folder_path}/${trial.content.music.stimulus}.mp3`,
-      labels: [trial.content.anchors.anchor1, trial.content.anchors.anchor2],
-      prompt: `
+        type: jsPsychCustomAudioSliderResponse,
+        stimulus: `${rel_audio_folder_path}/${trial.content.music.stimulus}.mp3`,
+        labels: [trial.content.anchors.anchor1, trial.content.anchors.anchor2],
+        require_movement: true,
+        prompt: `
       <p> TEST PROMPT </p>
       `,
-      on_start: () => {
-        console.log("DEBUG: trials", trial);
-      },
-      on_finish: ({ rt, response }) => {
-        console.log("rt and response", rt, response);
-        const data = {
-          subj_code: worker_id,
-          response: response,
-          rt,
-          trial,
-        };
+        on_start: () => {
+          console.log("DEBUG: trials", trial);
+        },
+        on_finish: ({ rt, response }) => {
+          console.log("rt and response", rt, response);
+          const data = {
+            subj_code: worker_id,
+            response: response,
+            rt,
+            trial,
+          };
 
-        api({
-          fn: 'data',
-          kwargs: {
-            worker_id,
-            data,
-            order: Object.keys(data),
-          },
-        });
-      },
-    })),
+          api({
+            fn: 'data',
+            kwargs: {
+              worker_id,
+              data,
+              order: Object.keys(data),
+            },
+          });
+        },
+      })),
   };
 
   timeline.push(musicalign_trials);
+
+  const musicmusic_trials = {
+    type: jsPsychCustomMusicmusic,
+
+    timeline: sliceIfDev(trials.filter(trial => trial.type == "musicmusic"))
+      .map((trial) => ({
+        type: jsPsychCustomMusicmusic,
+        audio: rel_second_audio_folder_path + "/" + trial.content.music + ".mp3",
+        audio2: rel_second_audio_folder_path + "/" + trial.content.like + ".mp3",
+        audio3: rel_second_audio_folder_path + "/" + trial.content.dislike + ".mp3",
+        prompt: `
+      <h1> TEST TITLE </h1>
+      <p> TEST PROMPT </p>
+      `,
+        on_start: () => {
+          console.log("DEBUG: trials", trial);
+        },
+        on_finish: ({ rt, response }) => {
+          console.log("rt and response", rt, response);
+          const data = {
+            subj_code: worker_id,
+            response: response,
+            rt,
+            trial,
+          };
+
+          api({
+            fn: 'data',
+            kwargs: {
+              worker_id,
+              data,
+              order: Object.keys(data),
+            },
+          });
+        },
+      })),
+  };
+
+  timeline.push(musicmusic_trials);
 
 
   // const demographics_questions_instructions = {

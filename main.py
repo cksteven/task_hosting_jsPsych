@@ -140,7 +140,8 @@ if __name__ == "__main__":
     # if reload_enabled:
     logger.info("App reload is enabled.")
     # Reload
-    app.run(debug=True, host="0.0.0.0", port=port, threaded=False, ssl_context=('vader_psych_wisc_edu.pem', 'plain.key'))
+    app.run(debug=True, host="0.0.0.0", port=port, threaded=False)
+    # app.run(debug=True, host="0.0.0.0", port=port, threaded=False, ssl_context=('vader_psych_wisc_edu.pem', 'plain.key'))
     # else:
     #     logger.info("App reload is disabled.")
     #     serve(TransLogger(app), host="0.0.0.0", port=port, threads=1, url_scheme='https')

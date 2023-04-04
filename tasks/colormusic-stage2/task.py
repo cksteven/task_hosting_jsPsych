@@ -136,9 +136,13 @@ class Task:
 
     rows = [{'type': 'colormusic', 'content': row} for row in music_list]
     global_rows += rows
+    if randomize_order:
+      random.shuffle(rows)
 
     color_coords = self.get_color_coords()
     color_coords = [row for row in color_coords if row['color'] != 'Background']
+    if randomize_order:
+      random.shuffle(color_coords)
 
     list_filename = "anchors_semantic_ratings.csv"
     rows = read_rows(self.trial_lists_folder_path + '/' + list_filename)
@@ -147,16 +151,17 @@ class Task:
 
     list_filename = "anchors_semantic_ratings.csv"
     rows = read_rows(self.trial_lists_folder_path + '/' + list_filename)
+    if randomize_order:
+      random.shuffle(music_list)
     rows = [{'type': 'music', 'content': {'anchors': row, 'music': music}} for music in music_list for row in rows]
     global_rows += rows
 
     list_filename = "music_matching_stimuli.csv"
     rows = read_rows(self.trial_lists_folder_path + '/' + list_filename)
     rows = [{'type': 'musicmusic', 'content': row} for row in rows]
-    global_rows += rows
-
     if randomize_order:
-      random.shuffle(global_rows)
+      random.shuffle(music_list)
+    global_rows += rows
 
     trials = [
         dict({'trial_number': index + 1}, **row) for index, row in enumerate(global_rows)
