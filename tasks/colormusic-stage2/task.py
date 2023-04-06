@@ -65,7 +65,7 @@ class Task:
       consent_agreed = False
 
     else:
-      trials = self.generate_trials(worker_id)
+      trials = read_rows(trials_file_path)
       # trials = []
       num_trials = len(trials)
       if os.path.exists(data_file_path):
@@ -135,9 +135,10 @@ class Task:
     music_list = self.get_music_list()
 
     rows = [{'type': 'colormusic', 'content': row} for row in music_list]
-    global_rows += rows
     if randomize_order:
       random.shuffle(rows)
+    global_rows += rows
+
 
     color_coords = self.get_color_coords()
     color_coords = [row for row in color_coords if row['color'] != 'Background']
@@ -159,7 +160,12 @@ class Task:
 
     list_filename = "music_matching_stimuli.csv"
     rows = read_rows(self.trial_lists_folder_path + '/' + list_filename)
-    rows = [{'type': 'musicmusic', 'content': row} for row in rows]
+    rows = [{'type': 'musicmusic', 'content': {
+      'music': row["music"],
+      'like': row["like"],
+      'dislike': row["dislike"],
+      'left': 'like' if random.random() < 0.5 else 'dislike'
+      }} for row in rows]
     if randomize_order:
       random.shuffle(music_list)
     global_rows += rows

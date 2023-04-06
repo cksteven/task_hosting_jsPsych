@@ -35,6 +35,11 @@ const {
     kwargs: { worker_id, reset, num_categories },
   });
 
+  var jsPsych = initJsPsych({
+    fullscreen,
+    show_progress_bar: true,
+    auto_update_progress_bar: false,
+  });
 
   console.log("ALL TRIALS", trials);
 
@@ -112,13 +117,44 @@ const {
     show_clickable_nav: true,
     pages: [
       /* html */ `
-      <h1> Instruction TO CHANGE </h1>
+      <p> There are four tasks in this experiment.
+      When you are done with all four tasks, you will be taken to a survey.
+      Please make sure to carefully complete all tasks and the survey,
+      otherwise your credit (or payment?) may not be approved.
+      </p>
 
-      <p class="lead">In this experiment, you will hear about 20 short music clips. While listening to each one, you will see four colors. Your task is to choose the color that most goes with the music piece that is currently playing. You need to hear each piece until the end and can only make a selection at the end of the piece. Pay careful attention as sometimes you may be instructed to make a specific selection.
-      </p> <p class="lead"> If you are not sure what color to choose, just go with whatever feels right.
-      </p> <p class="lead">To hear each music piece, click on the sound icon. You can replay it by clicking it again, if you like.
-      </p> <p class="lead">When you are done with this color selection task, you will be taken to a survey. Please make sure to carefully complete the survey, otherwise your research credit may not be approved.
-        </p>`,
+      <p> In the first task, you will hear about 30 short music clips.
+      While listening to each one, you will see a matrix of colors.
+      Your task is to choose the three colors that are most <b>consistent</b>
+      with the music piece that is currently playing.
+      You need to hear each piece at least once before you could begin
+      selecting colors.
+      </p>
+
+      <p> Please choose the most, the second-most, and the third-most
+      <b>consistent</b> color in that order. The color will disappear as it is selected.
+      As you finish selecting the three most consistent colors,
+      all colors will reappear on the screen, and you will need to choose
+      the three colors that are most <b>inconsistent</b> with the music.
+      </p>
+
+      <p> Similarly, please choose the most, second-most, and third-most
+      <b>inconsistent</b> colors in that order.
+      Again, the color will disappear as it is selected.
+      </p>
+
+      <p> The music will loop until all six color choices had been made
+      for each selection.
+      </p>
+
+      <p> Once you have completed the selection of inconsistent colors,
+      you will move on to the next music clip and repeat the process.
+      </p>
+
+      <p> If you are not sure what color to choose,
+      just go with whatever feels right.
+      </p>
+    `,
     ],
   };
   if (trials.length > 0) timeline.push(instructions);
@@ -146,7 +182,8 @@ const {
         colorjs: Color,
         // konvajs: Konva,
         on_start: () => {
-          console.log("DEBUG: trials", trial);
+          console.log("DEBUG: trial", trial);
+          jsPsych.setProgressBar((Number(trial.trial_number) - 1) / num_trials);
         },
         on_finish: ({ rt, response }) => {
           console.log("rt and response", rt, response);
@@ -171,25 +208,64 @@ const {
 
   timeline.push(colorboard_trials);
 
+  const instructions2 = {
+    type: jsPsychInstructions,
+    key_forward: 'space',
+    key_backward: 'backspace',
+    show_clickable_nav: true,
+    pages: [
+      /* html */ `
+      <p> Thank you for completing the first task!
+      If you need a break, feel free to take one.
+      When you are ready to continue,
+      please read the introduction to the second task below carefully.
+      </p>
+
+      <p> How fast is red? How wet is green? How do you like purple?
+      In the second task, you will see colors and rate them along various scales like these.
+      </p>
+
+      <p> You can rate it by typing the number on your keyboard,
+      or clicking the number directly on the screen.
+      As you make the selection, it will automatically move on to the next rating.
+      </p>
+
+      <p> You might find that some scales are not relevant to colors.
+      For example, it might not be obvious how serious or passive a color is.
+      For these, please follow your instincts and go with your first impression.
+      </p>
+    `,
+    ],
+  };
+  if (trials.length > 0) timeline.push(instructions2);
 
   const coloralign_trials = {
-    type: jsPsychHtmlSliderResponse,
+    type: jsPsychHtmlButtonResponse,
 
     timeline: sliceIfDev(trials.filter(trial => trial.type == "color"))
       .map((trial) => ({
-        type: jsPsychHtmlSliderResponse,
+        type: jsPsychHtmlButtonResponse,
         stimulus: `<div style="
-        height: 300px;
-        width: 300px;
+        height: 500px;
+        width: ${document.body.clientWidth};
         background-color: ${coords2rgb(trial.content.color)};
       "></div>`,
-        labels: [trial.content.anchors.anchor1, trial.content.anchors.anchor2],
-        require_movement: true,
+        choices: [1, 2, 3, 4, 5, 6, 7],
+        button_html: `<button class="jspsych-btn"
+        style="
+        height: 100px;
+        width: 100px;
+        "
+        >%choice%</button>`,
+        // labels: [trial.content.anchors.anchor1, trial.content.anchors.anchor2],
         prompt: `
+      <p> 1 = most ${trial.content.anchors.anchor1} </p>
+      <p> 7 = most ${trial.content.anchors.anchor2} </p>
       <p> TEST PROMPT </p>
       `,
         on_start: () => {
           console.log("DEBUG: trials", trial);
+          jsPsych.setProgressBar((Number(trial.trial_number) - 1) / num_trials);
         },
         on_finish: ({ rt, response }) => {
           console.log("rt and response", rt, response);
@@ -214,21 +290,57 @@ const {
 
   timeline.push(coloralign_trials);
 
+  const instructions3 = {
+    type: jsPsychInstructions,
+    key_forward: 'space',
+    key_backward: 'backspace',
+    show_clickable_nav: true,
+    pages: [
+          /* html */ `
+          <p> Thank you for completing the second task!
+          If you need a break, feel free to take one.
+          When you are ready to continue, please read the introduction to the third task below carefully.
+          </p>
+
+          <p> The third task you are about to do is to rate music clips on various scales,
+          just like what you have just done for colors.
+          </p>
+
+          <p> You need to hear each piece at least once before you could begin
+          rating it on various scales.
+          The music will loop until it has been rated on all scales.
+          </p>
+
+          <p> Again, some scales are not relevant to music.
+          Please follow your instincts and go with your first impression.
+          </p>
+        `,
+    ],
+  };
+  if (trials.length > 0) timeline.push(instructions3);
+
   const musicalign_trials = {
-    type: jsPsychCustomAudioSliderResponse,
+    type: jsPsychCustomAudioButtonResponse,
 
     timeline: sliceIfDev(trials.filter(trial => trial.type == "music"))
       .map((trial) => ({
-        type: jsPsychCustomAudioSliderResponse,
+        type: jsPsychCustomAudioButtonResponse,
         stimulus: `${rel_audio_folder_path}/${trial.content.music.stimulus}.mp3`,
-        labels: [trial.content.anchors[0].anchor1, trial.content.anchors[0].anchor2],
+        choices: [1, 2, 3, 4, 5, 6, 7],
+        button_html: `<button class="jspsych-btn"
+        style="
+        height: 100px;
+        width: 100px;
+        "
+        >%choice%</button>`,
+        // labels: [trial.content.anchors[0].anchor1, trial.content.anchors[0].anchor2],
         labels_mul: trial.content.anchors.map(anchor => [anchor.anchor1, anchor.anchor2]),
-        require_movement: true,
         prompt: `
       <p> TEST PROMPT </p>
       `,
         on_start: () => {
           console.log("DEBUG: trials", trial);
+          jsPsych.setProgressBar((Number(trial.trial_number) - 1) / num_trials);
         },
         on_finish: ({ rt, response }) => {
           console.log("rt and response", rt, response);
@@ -253,6 +365,35 @@ const {
 
   timeline.push(musicalign_trials);
 
+  const instructions4 = {
+    type: jsPsychInstructions,
+    key_forward: 'space',
+    key_backward: 'backspace',
+    show_clickable_nav: true,
+    pages: [
+          /* html */ `
+          <p> Thank you for completing the third task! You are almost there!
+          If you need a break, feel free to take one.
+          When you are ready to continue, please read the introduction to the last task below carefully.
+          </p>
+
+          <p> For the last task, you will be presented with three music clips in each trial.
+          The clips will automatically play in the order of the first, second,
+          and third clip. After listening to all three clips, you need to
+          determine which of the latter two clips is more similar to the first
+          clip by clicking on the sound icon. Once you have made your selection,
+          you will proceed to the next trial.
+          </p>
+
+          <p> It's important to note that unlike the previous tasks,
+          the music clips will not loop in this task. Therefore, it's crucial
+          that you remain focused and attentive throughout the task to make accurate selections.
+          </p>
+        `,
+    ],
+  };
+  if (trials.length > 0) timeline.push(instructions4);
+
   const musicmusic_trials = {
     type: jsPsychCustomMusicmusic,
 
@@ -260,14 +401,15 @@ const {
       .map((trial) => ({
         type: jsPsychCustomMusicmusic,
         audio: rel_second_audio_folder_path + "/" + trial.content.music + ".mp3",
-        audio2: rel_second_audio_folder_path + "/" + trial.content.like + ".mp3",
-        audio3: rel_second_audio_folder_path + "/" + trial.content.dislike + ".mp3",
+        audio2: rel_second_audio_folder_path + "/" + (trial.content.left == "like" ? trial.content.like : trial.content.dislike)  + ".mp3",
+        audio3: rel_second_audio_folder_path + "/" + (trial.content.left == "like" ? trial.content.dislike : trial.content.like) + ".mp3",
         prompt: `
       <h1> TEST TITLE </h1>
       <p> TEST PROMPT </p>
       `,
         on_start: () => {
           console.log("DEBUG: trials", trial);
+          jsPsych.setProgressBar((Number(trial.trial_number) - 1) / num_trials);
         },
         on_finish: ({ rt, response }) => {
           console.log("rt and response", rt, response);
@@ -382,10 +524,6 @@ const {
   //     auto_update_progress_bar: false,
   // });
 
-  var jsPsych = initJsPsych({
-    fullscreen,
-    show_progress_bar: true,
-    auto_update_progress_bar: false,
-  });
+
   jsPsych.run(timeline);
 })();
