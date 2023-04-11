@@ -81,7 +81,7 @@ const {
     return `rgb(${r}, ${g}, ${b})`
   };
 
-  var sliceIfDev = function (arr, num2keep = 3) {
+  var sliceIfDev = function (arr, num2keep = 1) {
     console.log("DEV", dev);
     if (dev == true) {
       return arr.slice(0, num2keep);

@@ -3,7 +3,7 @@
  * manually add each a new script element!
  */
 export default () => {
-    const pluginsPath = '../../lib/jspsych/plugins/';
+    const pluginsPath = '../../lib/jspsych-7.3.1/plugins/';
     return axios.get(pluginsPath).then(({ data: content }) => (
         // console.log('data', data),
         // console.log('content', content),
